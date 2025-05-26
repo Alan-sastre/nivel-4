@@ -1,0 +1,353 @@
+class ScenaJuego1 extends Phaser.Scene {
+  constructor() {
+    super("ScenaJuego1");
+    this.piezasRecolectadas = 0;
+    this.totalPiezas = 6;
+    // Definir el laberinto (0 = camino, 1 = pared, 2 = pieza tipo 1, 3 = pieza tipo 2, 4 = pieza tipo 3)
+    this.maze = [
+      [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+      [1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 2, 0, 1],
+      [1, 0, 1, 1, 1, 0, 1, 0, 1, 1, 1, 1, 1, 0, 1],
+      [1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1],
+      [1, 0, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 1, 0, 1],
+      [1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1],
+      [1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 0, 1, 0, 1],
+      [1, 0, 0, 0, 0, 0, 0, 0, 1, 3, 1, 0, 1, 0, 1],
+      [1, 0, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0, 0, 0, 1],
+      [1, 4, 0, 0, 0, 0, 1, 5, 0, 0, 0, 0, 0, 6, 1],
+      [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+    ];
+    this.cellSize = 40;
+    this.margin = 20; // Margen para evitar que el personaje se salga
+  }
+
+  preload() {
+    this.load.image("wall", "assets/scenaJuego1/wall.png");
+    this.load.spritesheet("robot", "assets/scenaJuego1/robot.png", {
+      frameWidth: 198,
+      frameHeight: 188,
+    });
+    this.load.image("pieza1", "assets/scenaJuego1/pieza1.png");
+    this.load.image("pieza2", "assets/scenaJuego1/pieza2.png");
+    this.load.image("pieza3", "assets/scenaJuego1/pieza3.png");
+    this.load.image("pieza4", "assets/scenaJuego1/pieza4.png");
+    this.load.image("pieza5", "assets/scenaJuego1/pieza5.png");
+    this.load.image("pieza6", "assets/scenaJuego1/pieza6.png");
+
+    // Ya no necesitamos generar una textura para la luz si no usamos el sprite de luz
+    // const graphics = this.make.graphics();
+    // const radius = 150;
+    // graphics.fillStyle(0xffffff, 1);
+    // graphics.fillCircle(radius, radius, radius);
+    // graphics.generateTexture("light", radius * 2, radius * 2);
+    // graphics.destroy();
+  }
+
+  create() {
+    // Fondo negro
+    this.cameras.main.setBackgroundColor("#000000");
+
+    // Centrar el juego
+    const gameWidth = this.maze[0].length * this.cellSize;
+    const gameHeight = this.maze.length * this.cellSize;
+    const screenWidth = this.sys.game.config.width;
+    const screenHeight = this.sys.game.config.height;
+
+    // Calcular el offset para centrar con márgenes
+    const offsetX = (screenWidth - gameWidth) / 2;
+    const offsetY = (screenHeight - gameHeight) / 2;
+
+    // Grupos para paredes y piezas
+    this.walls = this.physics.add.staticGroup();
+    this.piezas = this.physics.add.group();
+
+    // Construir el laberinto
+    for (let row = 0; row < this.maze.length; row++) {
+      for (let col = 0; col < this.maze[row].length; col++) {
+        const x = col * this.cellSize + this.cellSize / 2 + offsetX;
+        const y = row * this.cellSize + this.cellSize / 2 + offsetY;
+
+        if (this.maze[row][col] === 1) {
+          const wall = this.walls
+            .create(x, y, "wall")
+            .setScale(this.cellSize / 64)
+            .refreshBody();
+        } else if (this.maze[row][col] === 2) {
+          const pieza = this.piezas
+            .create(x, y, "pieza1")
+            .setScale(0.5)
+            .setOrigin(0.5, 0.5);
+          pieza.setCollideWorldBounds(true);
+          pieza.tipo = 1;
+        } else if (this.maze[row][col] === 3) {
+          const pieza = this.piezas
+            .create(x, y, "pieza2")
+            .setScale(0.5)
+            .setOrigin(0.5, 0.5);
+          pieza.setCollideWorldBounds(true);
+          pieza.tipo = 2;
+        } else if (this.maze[row][col] === 4) {
+          const pieza = this.piezas
+            .create(x, y, "pieza3")
+            .setScale(0.5)
+            .setOrigin(0.5, 0.5);
+          pieza.setCollideWorldBounds(true);
+          pieza.tipo = 3;
+        } else if (this.maze[row][col] === 5) {
+          const pieza = this.piezas
+            .create(x, y, "pieza4")
+            .setScale(0.5)
+            .setOrigin(0.5, 0.5);
+          pieza.setCollideWorldBounds(true);
+          pieza.tipo = 4;
+        } else if (this.maze[row][col] === 6) {
+          const pieza = this.piezas
+            .create(x, y, "pieza5")
+            .setScale(0.5)
+            .setOrigin(0.5, 0.5);
+          pieza.setCollideWorldBounds(true);
+          pieza.tipo = 5;
+        }
+      }
+    }
+
+    // Añadir la sexta pieza
+    const sextaPieza = this.piezas
+      .create(
+        offsetX + 5 * this.cellSize + this.cellSize / 2,
+        offsetY + 2 * this.cellSize + this.cellSize / 2,
+        "pieza6"
+      )
+      .setScale(0.5)
+      .setOrigin(0.5, 0.5);
+    sextaPieza.setCollideWorldBounds(true);
+    sextaPieza.tipo = 6;
+
+    // Jugador
+    this.player = this.physics.add.sprite(
+      offsetX + this.cellSize * 1.5,
+      offsetY + this.cellSize * 1.5,
+      "robot"
+    );
+    this.player.setScale(0.15);
+
+    // Ajustar el cuerpo de colisión
+    const bodyWidth = 160;
+    const bodyHeight = 205;
+    this.player.body.setSize(bodyWidth, bodyHeight);
+    const offsetX_body = (198 - bodyWidth) / 2;
+    const offsetY_body = (188 - bodyHeight) / 2 + 25;
+    this.player.body.setOffset(offsetX_body, offsetY_body);
+
+    // Crear animaciones para el robot
+    this.anims.create({
+      key: "robot_idle",
+      frames: this.anims.generateFrameNumbers("robot", { start: 0, end: 0 }),
+      frameRate: 5,
+      repeat: -1,
+    });
+
+    this.anims.create({
+      key: "robot_run",
+      frames: this.anims.generateFrameNumbers("robot", { start: 0, end: 1 }),
+      frameRate: 10,
+      repeat: -1,
+    });
+
+    // Iniciar con animación idle
+    this.player.anims.play("robot_idle");
+
+    // Colisiones
+    this.physics.add.collider(this.player, this.walls);
+    this.physics.add.overlap(
+      this.player,
+      this.piezas,
+      this.recolectarPieza,
+      null,
+      this
+    );
+
+    // Controles
+    this.cursors = this.input.keyboard.createCursorKeys();
+    this.keys = this.input.keyboard.addKeys({
+      up: Phaser.Input.Keyboard.KeyCodes.W,
+      down: Phaser.Input.Keyboard.KeyCodes.S,
+      left: Phaser.Input.Keyboard.KeyCodes.A,
+      right: Phaser.Input.Keyboard.KeyCodes.D,
+    });
+
+    // Puntuación
+    this.scoreText = this.add.text(16, 16, "Piezas: 0/" + this.totalPiezas, {
+      fontSize: "24px",
+      fill: "#fff",
+      fontFamily: "Arial",
+    });
+    this.scoreText.setDepth(1001); // Asegurar que el texto esté sobre la oscuridad
+
+    // Añadir contador de tipos de piezas
+    this.piezasTipo1 = 0;
+    this.piezasTipo2 = 0;
+    this.piezasTipo3 = 0;
+    this.piezasTipo4 = 0;
+    this.piezasTipo5 = 0;
+    this.piezasTipo6 = 0;
+    this.piezasText = this.add.text(16, 50, "", {
+      fontSize: "20px",
+      fill: "#fff",
+      fontFamily: "Arial",
+    });
+    this.piezasText.setDepth(1001); // Asegurar que el texto esté sobre la oscuridad
+
+    // Crear el pincel para la luz con bordes suaves
+    this.lightBrush = this.make.graphics();
+    const lightOuterRadius = 100; // El radio exterior máximo del efecto de luz
+    const numberOfBrushLayers = 20; // Número de capas para crear el degradado del pincel
+    // Alpha por capa: al acumularse, el centro será más opaco (borrará más)
+    const alphaPerLayer = 0.1;
+
+    this.lightBrush.clear();
+    // Dibujamos círculos concéntricos, desde el más grande al más pequeño.
+    // Cada círculo añade opacidad al pincel en el área que cubre.
+    // El centro, cubierto por todos los círculos, será el más opaco.
+    for (let i = 0; i < numberOfBrushLayers; i++) {
+        // El radio del círculo actual en esta capa del pincel.
+        // Va desde lightOuterRadius hasta casi 0.
+        const currentBrushRadius = lightOuterRadius - (i * lightOuterRadius / numberOfBrushLayers);
+        if (currentBrushRadius <= 0) continue;
+
+        this.lightBrush.fillStyle(0xffffff, alphaPerLayer);
+        this.lightBrush.fillCircle(0, 0, currentBrushRadius);
+    }
+    // Ahora this.lightBrush es un círculo blanco, opaco en el centro y transparente en los bordes.
+
+    // Crear la Render Texture que actuará como nuestra capa de oscuridad
+    this.visionTexture = this.make.renderTexture({
+      width: this.sys.game.config.width,
+      height: this.sys.game.config.height
+    }, false);
+
+    // Añadir la Render Texture a la escena y asegurar que esté por encima de todo (excepto UI)
+    this.add.existing(this.visionTexture);
+    this.visionTexture.setDepth(1000);
+
+    // Ya no necesitamos el antiguo this.darkness
+    // this.darkness = this.add.graphics();
+    // this.darkness.setDepth(1000);
+  }
+
+  update() {
+    const velocidad = 80;
+    let vx = 0;
+    let vy = 0;
+
+    // Controles
+    if (this.cursors.left.isDown || this.keys.left.isDown) vx = -velocidad;
+    else if (this.cursors.right.isDown || this.keys.right.isDown)
+      vx = velocidad;
+
+    if (this.cursors.up.isDown || this.keys.up.isDown) vy = -velocidad;
+    else if (this.cursors.down.isDown || this.keys.down.isDown) vy = velocidad;
+
+    this.player.setVelocity(vx, vy);
+
+    // Actualizar la Render Texture (nuestra nueva capa de oscuridad)
+    this.visionTexture.clear(); // Limpiar la textura de la iteración anterior
+
+    // 1. Rellenar toda la Render Texture con negro completamente opaco
+    this.visionTexture.fill(0x000000, 1);
+
+    // 2. "Borrar" un área usando nuestro pincel de luz suave, centrado en el jugador
+    this.visionTexture.erase(this.lightBrush, this.player.x, this.player.y);
+
+    // El código anterior para el difuminado ya no es necesario aquí.
+
+    // Actualizar animación según el movimiento
+    if (vx !== 0 || vy !== 0) {
+      this.player.anims.play("robot_run", true);
+      if (vx < 0) {
+        this.player.setFlipX(true);
+      } else if (vx > 0) {
+        this.player.setFlipX(false);
+      }
+    } else {
+      this.player.anims.play("robot_idle", true);
+    }
+  }
+
+  recolectarPieza(player, pieza) {
+    pieza.destroy();
+    this.piezasRecolectadas++;
+
+    // Actualizar contador según el tipo de pieza (esto puede quedar si lo usas para otra lógica)
+    switch (pieza.tipo) {
+      case 1:
+        this.piezasTipo1++;
+        break;
+      case 2:
+        this.piezasTipo2++;
+        break;
+      case 3:
+        this.piezasTipo3++;
+        break;
+      case 4:
+        this.piezasTipo4++;
+        break;
+      case 5:
+        this.piezasTipo5++;
+        break;
+      case 6:
+        this.piezasTipo6++;
+        break;
+    }
+
+    // Actualizar texto de puntuación general
+    this.scoreText.setText(
+      "Piezas: " + this.piezasRecolectadas + "/" + this.totalPiezas
+    );
+
+    // Nos aseguramos de que la actualización de this.piezasText esté comentada o eliminada
+    // if (this.piezasText) {
+    //   this.piezasText.setText(
+    //     `Piezas: 1:${this.piezasTipo1} 2:${this.piezasTipo2} 3:${this.piezasTipo3} 4:${this.piezasTipo4} 5:${this.piezasTipo5} 6:${this.piezasTipo6}`
+    //   );
+    // }
+
+    if (this.piezasRecolectadas === this.totalPiezas) {
+      // Detener el movimiento del jugador
+      this.player.setVelocity(0, 0);
+      this.player.setActive(false);
+
+      // Esperar 2 segundos antes de mostrar el mensaje
+      this.time.delayedCall(2000, () => {
+        const completedText = this.add.text(0, 0, "¡Enhorabuena!\nHa logrado encontrar todas las piezas.", {
+          fontSize: "36px", // Tamaño de fuente adecuado
+          fill: "#FFFFFF", // Color blanco clásico
+          fontFamily: "Arial, sans-serif", // Fuente estándar y formal
+          align: "center",
+          wordWrap: { width: this.sys.game.config.width - 60 }
+        });
+        completedText.setOrigin(0.5, 0.5);
+        completedText.setPosition(
+          this.sys.game.config.width / 2,
+          this.sys.game.config.height / 2
+        );
+        completedText.setDepth(1002); // Asegurar que esté sobre todo
+
+        // Eliminamos la animación tween para un mensaje más formal
+        // this.tweens.add({
+        //   targets: completedText,
+        //   scale: 1.1,
+        //   ease: 'Power1',
+        //   duration: 500,
+        //   yoyo: true,
+        //   repeat: 1
+        // });
+
+        // Esperar 3 segundos más antes de cambiar de escena
+        this.time.delayedCall(3000, () => {
+          this.scene.start("scenaPreguntas");
+        }, [], this);
+      }, [], this);
+    }
+  }
+}
