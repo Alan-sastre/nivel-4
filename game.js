@@ -5,10 +5,10 @@ function isMobile() {
 var config = {
   type: Phaser.AUTO,
   scale: {
-    mode: Phaser.Scale.FIT,
+    mode: Phaser.Scale.FIT, // FIT se encarga de ajustar el juego al contenedor manteniendo la relación de aspecto.
     autoCenter: Phaser.Scale.CENTER_BOTH,
-    width: 1000,
-    height: 500,
+    width: 1000, // Ancho base del juego
+    height: 500, // Alto base del juego
   },
   physics: {
     default: "arcade",
