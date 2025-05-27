@@ -481,96 +481,91 @@ class ScenaJuego1 extends Phaser.Scene {
   }
 
   recolectarPieza(player, pieza) {
-    pieza.destroy();
-    this.piezasRecolectadas++;
+      pieza.destroy();
+      this.piezasRecolectadas++;
 
-    // Actualizar contador según el tipo de pieza (esto puede quedar si lo usas para otra lógica)
-    switch (pieza.tipo) {
-      case 1:
-        this.piezasTipo1++;
-        break;
-      case 2:
-        this.piezasTipo2++;
-        break;
-      case 3:
-        this.piezasTipo3++;
-        break;
-      case 4:
-        this.piezasTipo4++;
-        break;
-      case 5:
-        this.piezasTipo5++;
-        break;
-      case 6:
-        this.piezasTipo6++;
-        break;
-    }
+      // Actualizar contador según el tipo de pieza (esto puede quedar si lo usas para otra lógica)
+      switch (pieza.tipo) {
+        case 1:
+          this.piezasTipo1++;
+          break;
+        case 2:
+          this.piezasTipo2++;
+          break;
+        case 3:
+          this.piezasTipo3++;
+          break;
+        case 4:
+          this.piezasTipo4++;
+          break;
+        case 5:
+          this.piezasTipo5++;
+          break;
+        case 6:
+          this.piezasTipo6++;
+          break;
+      }
 
-    // Actualizar texto de puntuación general
-    this.scoreText.setText(
-      "Piezas: " + this.piezasRecolectadas + "/" + this.totalPiezas
-    );
-
-    // Nos aseguramos de que la actualización de this.piezasText esté comentada o eliminada
-    // if (this.piezasText) {
-    //   this.piezasText.setText(
-    //     `Piezas: 1:${this.piezasTipo1} 2:${this.piezasTipo2} 3:${this.piezasTipo3} 4:${this.piezasTipo4} 5:${this.piezasTipo5} 6:${this.piezasTipo6}`
-    //   );
-    // }
-
-    if (this.piezasRecolectadas === this.totalPiezas) {
-      // Detener el movimiento del jugador
-      this.player.setVelocity(0, 0);
-      this.player.setActive(false);
-
-      // Esperar 2 segundos antes de mostrar el mensaje
-      this.time.delayedCall(
-        2000,
-        () => {
-          const completedText = this.add.text(
-            0,
-            0,
-            "¡Enhorabuena!\nHa logrado encontrar todas las piezas.",
-            {
-              fontSize: "36px", // Tamaño de fuente adecuado
-              fill: "#FFFFFF", // Color blanco clásico
-              fontFamily: "Arial, sans-serif", // Fuente estándar y formal
-              align: "center",
-              wordWrap: { width: this.sys.game.config.width - 60 },
-            }
-          );
-          completedText.setOrigin(0.5, 0.5);
-          completedText.setPosition(
-            this.sys.game.config.width / 2,
-            this.sys.game.config.height / 2
-          );
-          completedText.setDepth(1002); // Asegurar que esté sobre todo
-
-          // Eliminamos la animación tween para un mensaje más formal
-          // this.tweens.add({
-          //   targets: completedText,
-          //   scale: 1.1,
-          //   ease: 'Power1',
-          //   duration: 500,
-          //   yoyo: true,
-          //   repeat: 1
-          // });
-
-          // Esperar 3 segundos más antes de cambiar de escena
-          this.time.delayedCall(
-            3000,
-            () => {
-              this.scene.start("scenaPreguntas");
-            },
-            [],
-            this
-          );
-        },
-        [],
-        this
+      // Actualizar texto de puntuación general
+      this.scoreText.setText(
+        "Piezas: " + this.piezasRecolectadas + "/" + this.totalPiezas
       );
+
+      // Nos aseguramos de que la actualización de this.piezasText esté comentada o eliminada
+      // if (this.piezasText) {
+      //   this.piezasText.setText(
+      //     `Piezas: 1:${this.piezasTipo1} 2:${this.piezasTipo2} 3:${this.piezasTipo3} 4:${this.piezasTipo4} 5:${this.piezasTipo5} 6:${this.piezasTipo6}`
+      //   );
+      // }
+
+      if (this.piezasRecolectadas === this.totalPiezas) {
+        // Detener el movimiento del jugador
+        this.player.setVelocity(0, 0);
+        this.player.setActive(false);
+
+        // Esperar 2 segundos antes de mostrar el mensaje
+        this.time.delayedCall(
+          2000,
+          () => {
+            const completedText = this.add.text(
+              0,
+              0,
+              "¡Enhorabuena!\nHa logrado encontrar todas las piezas.",
+              {
+                fontSize: "36px", // Tamaño de fuente adecuado
+                fill: "#FFFFFF", // Color blanco clásico
+                fontFamily: "Arial, sans-serif", // Fuente estándar y formal
+                align: "center",
+                wordWrap: { width: this.sys.game.config.width - 60 },
+              }
+            );
+            completedText.setOrigin(0.5, 0.5);
+            completedText.setPosition(
+              this.sys.game.config.width / 2,
+              this.sys.game.config.height / 2
+            );
+            completedText.setDepth(1002); // Asegurar que esté sobre todo
+
+            // Esperar 3 segundos más antes de cambiar de escena
+            this.time.delayedCall(
+              3000,
+              () => {
+                // Modificar esta parte para una transición correcta
+                this.scene.stop("ScenaJuego1");
+                this.scene.start("ScenaPreguntas", { fromScene: "ScenaJuego1" });
+
+                // Asegurar que el canvas se configure correctamente
+                this.game.renderer.reset();
+              },
+              [],
+              this
+            );
+          },
+          [],
+          this
+        );
+      }
     }
-  }
 
 }
 

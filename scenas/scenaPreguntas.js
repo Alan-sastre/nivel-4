@@ -35,6 +35,11 @@ class ScenaPreguntas extends Phaser.Scene {
     }
 
     create() {
+        // Asegurar que el canvas se configure correctamente
+        if (this.sys.game.renderer.type === Phaser.WEBGL) {
+            this.sys.game.renderer.reset();
+        }
+
         // Añadir imagen de fondo
         const fondo = this.add.image(this.cameras.main.width / 2, this.cameras.main.height / 2, 'fondoTaller');
         fondo.setDisplaySize(this.cameras.main.width, this.cameras.main.height);
