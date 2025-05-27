@@ -312,46 +312,151 @@ class ScenaJuego1 extends Phaser.Scene {
     });
   }
 
+  crearJoystickPersonalizado() {
+    const screenWidth = this.sys.game.config.width;
+    const screenHeight = this.sys.game.config.height;
+
+    // Posición del joystick (esquina inferior derecha)
+    const joystickX = screenWidth - 150;
+    const joystickY = screenHeight - 150;
+
+    // Crear la base del joystick
+    this.joystickBase = this.add.graphics();
+    this.joystickBase.fillStyle(0x888888, 0.5);
+    this.joystickBase.fillCircle(joystickX, joystickY, this.joystickRadius);
+    this.joystickBase.lineStyle(4, 0xffffff, 0.8);
+    this.joystickBase.strokeCircle(joystickX, joystickY, this.joystickRadius);
+    this.joystickBase.setScrollFactor(0);
+    this.joystickBase.setDepth(1000);
+
+    // Crear el thumb del joystick
+    this.joystickThumb = this.add.graphics();
+    this.joystickThumb.fillStyle(0xffffff, 0.9);
+    this.joystickThumb.fillCircle(joystickX, joystickY, this.thumbRadius);
+    this.joystickThumb.lineStyle(2, 0x000000, 0.5);
+    this.joystickThumb.strokeCircle(joystickX, joystickY, this.thumbRadius);
+    this.joystickThumb.setScrollFactor(0);
+    this.joystickThumb.setDepth(1001);
+
+    // Crear zona interactiva más grande para mejor usabilidad
+    const interactiveZone = this.add.zone(joystickX, joystickY, this.joystickRadius * 2.5, this.joystickRadius * 2.5);
+    interactiveZone.setInteractive();
+    interactiveZone.setScrollFactor(0);
+    interactiveZone.setDepth(999);
+    interactiveZone.setOrigin(0.5);
+
+    // Eventos del joystick
+    interactiveZone.on('pointerdown', (pointer) => {
+      if (!this.joystickActive) {
+        this.joystickActive = true;
+        this.joystickPointer = pointer;
+        this.actualizarPosicionThumb(pointer, joystickX, joystickY);
+      }
+    });
+
+    this.input.on('pointermove', (pointer) => {
+      if (this.joystickActive && pointer.id === this.joystickPointer.id) {
+        this.actualizarPosicionThumb(pointer, joystickX, joystickY);
+      }
+    });
+
+    this.input.on('pointerup', (pointer) => {
+      if (this.joystickActive && pointer.id === this.joystickPointer.id) {
+        this.joystickActive = false;
+        this.joystickPointer = null;
+        this.joystickVector = { x: 0, y: 0 };
+
+        // Volver el thumb al centro
+        this.joystickThumb.clear();
+        this.joystickThumb.fillStyle(0xffffff, 0.9);
+        this.joystickThumb.fillCircle(joystickX, joystickY, this.thumbRadius);
+        this.joystickThumb.lineStyle(2, 0x000000, 0.5);
+        this.joystickThumb.strokeCircle(joystickX, joystickY, this.thumbRadius);
+      }
+    });
+
+    this.input.on('pointerupoutside', (pointer) => {
+      if (this.joystickActive && pointer.id === this.joystickPointer.id) {
+        this.joystickActive = false;
+        this.joystickPointer = null;
+        this.joystickVector = { x: 0, y: 0 };
+
+        // Volver el thumb al centro
+        this.joystickThumb.clear();
+        this.joystickThumb.fillStyle(0xffffff, 0.9);
+        this.joystickThumb.fillCircle(joystickX, joystickY, this.thumbRadius);
+        this.joystickThumb.lineStyle(2, 0x000000, 0.5);
+        this.joystickThumb.strokeCircle(joystickX, joystickY, this.thumbRadius);
+      }
+    });
+
+    // Inicializar vector del joystick
+    this.joystickVector = { x: 0, y: 0 };
+  }
+
+  actualizarPosicionThumb(pointer, baseX, baseY) {
+    const dx = pointer.x - baseX;
+    const dy = pointer.y - baseY;
+    const distance = Math.sqrt(dx * dx + dy * dy);
+
+    let thumbX = baseX;
+    let thumbY = baseY;
+
+    if (distance > this.joystickDeadZone) {
+      if (distance <= this.joystickRadius) {
+        thumbX = pointer.x;
+        thumbY = pointer.y;
+      } else {
+        const angle = Math.atan2(dy, dx);
+        thumbX = baseX + Math.cos(angle) * this.joystickRadius;
+        thumbY = baseY + Math.sin(angle) * this.joystickRadius;
+      }
+
+      // Calcular vector normalizado
+      this.joystickVector = {
+        x: (thumbX - baseX) / this.joystickRadius,
+        y: (thumbY - baseY) / this.joystickRadius
+      };
+    } else {
+      this.joystickVector = { x: 0, y: 0 };
+    }
+
+    // Redibujar el thumb
+    this.joystickThumb.clear();
+    this.joystickThumb.fillStyle(0xffffff, 0.9);
+    this.joystickThumb.fillCircle(thumbX, thumbY, this.thumbRadius);
+    this.joystickThumb.lineStyle(2, 0x000000, 0.5);
+    this.joystickThumb.strokeCircle(thumbX, thumbY, this.thumbRadius);
+  }
+
   update() {
-    const velocidad = 160; // Puedes ajustar la velocidad del jugador
+    const velocidad = 200; // Velocidad aumentada para mejor respuesta
     let vx = 0;
     let vy = 0;
 
-    if (this.isMobile && this.joyStick && this.joystickCursors) {
-        // Movimiento con Joystick
-        if (this.joystickCursors.left.isDown) {
-            vx = -velocidad;
-        } else if (this.joystickCursors.right.isDown) {
-            vx = velocidad;
+    if (this.isMobile) {
+      // Movimiento con joystick personalizado
+      if (this.joystickActive && this.joystickVector) {
+        vx = this.joystickVector.x * velocidad;
+        vy = this.joystickVector.y * velocidad;
+
+        // Normalizar velocidad diagonal
+        if (Math.abs(vx) > 0 && Math.abs(vy) > 0) {
+          const length = Math.sqrt(vx * vx + vy * vy);
+          vx = (vx / length) * velocidad;
+          vy = (vy / length) * velocidad;
         }
+      }
+    } else {
+      // Controles de teclado para PC
+      if (this.cursors.left.isDown || this.keys.left.isDown) vx = -velocidad;
+      else if (this.cursors.right.isDown || this.keys.right.isDown) vx = velocidad;
 
-        if (this.joystickCursors.up.isDown) {
-            vy = -velocidad;
-        } else if (this.joystickCursors.down.isDown) {
-            vy = velocidad;
-        }
-
-        this.player.setVelocity(vx, vy);
-
-        // Normalizar velocidad diagonal si es necesario (opcional)
-        if (vx !== 0 && vy !== 0) {
-            const length = Math.sqrt(vx * vx + vy * vy);
-            this.player.setVelocityX(vx / length * velocidad);
-            this.player.setVelocityY(vy / length * velocidad);
-        }
-
-    } else if (!this.isMobile) {
-        // Controles de teclado para PC
-        if (this.cursors.left.isDown || this.keys.left.isDown) vx = -velocidad;
-        else if (this.cursors.right.isDown || this.keys.right.isDown) vx = velocidad;
-        else vx = 0; // Detener si no hay tecla horizontal
-
-        if (this.cursors.up.isDown || this.keys.up.isDown) vy = -velocidad;
-        else if (this.cursors.down.isDown || this.keys.down.isDown) vy = velocidad;
-        else vy = 0; // Detener si no hay tecla vertical
-
-        this.player.setVelocity(vx, vy);
+      if (this.cursors.up.isDown || this.keys.up.isDown) vy = -velocidad;
+      else if (this.cursors.down.isDown || this.keys.down.isDown) vy = velocidad;
     }
+
+    this.player.setVelocity(vx, vy);
 
     // Actualizar la Render Texture (nuestra nueva capa de oscuridad)
     if (this.visionTexture && this.lightBrush && this.player) {
