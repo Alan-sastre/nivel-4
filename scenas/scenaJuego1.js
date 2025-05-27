@@ -42,8 +42,7 @@ class ScenaJuego1 extends Phaser.Scene {
     this.load.image("pieza4", "assets/scenaJuego1/pieza4.png");
     this.load.image("pieza5", "assets/scenaJuego1/pieza5.png");
     this.load.image("pieza6", "assets/scenaJuego1/pieza6.png");
-    this.load.plugin('rexvirtualjoystickplugin', 'https://raw.githubusercontent.com/rexrainbow/phaser3-rex-notes/master/dist/rexvirtualjoystickplugin.min.js', true);
-
+    // NO cargamos el plugin del joystick
   }
 
   create() {
