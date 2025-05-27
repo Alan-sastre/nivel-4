@@ -5,10 +5,19 @@ function isMobile() {
 var config = {
   type: Phaser.AUTO,
   scale: {
-    mode: Phaser.Scale.FIT, // FIT se encarga de ajustar el juego al contenedor manteniendo la relación de aspecto.
+    mode: Phaser.Scale.RESIZE,
+    parent: "game",
+    width: "100%",
+    height: "100%",
     autoCenter: Phaser.Scale.CENTER_BOTH,
-    width: 1000, // Ancho base del juego
-    height: 500, // Alto base del juego
+    min: {
+      width: 800,
+      height: 400,
+    },
+    max: {
+      width: 1600,
+      height: 800,
+    },
   },
   physics: {
     default: "arcade",
@@ -19,13 +28,34 @@ var config = {
   },
   render: {
     pixelArt: true,
+    antialias: true,
+    roundPixels: true,
   },
   scene: [
     scenaPrincipal,
     ScenaJuego1,
-
-  ], //scenaPrincipal, ScenaJuego1,ScenaPreguntas,Rompecabezas,ArduinoGameScene,ArduinoGameScene2
+    ScenaPreguntas,
+    Rompecabezas,
+    ArduinoGameScene,
+    ArduinoGameScene2,
+  ],
 };
 
+// Crear el contenedor del juego
+const gameContainer = document.createElement("div");
+gameContainer.id = "game";
+document.body.appendChild(gameContainer);
+
+// Crear el juego
 var game = new Phaser.Game(config);
 
+// Manejar la orientación en móviles
+if (isMobile()) {
+  window.addEventListener("resize", function () {
+    if (window.innerHeight > window.innerWidth) {
+      document.getElementById("turn").style.display = "flex";
+    } else {
+      document.getElementById("turn").style.display = "none";
+    }
+  });
+}
