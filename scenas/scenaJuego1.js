@@ -19,10 +19,15 @@ class ScenaJuego1 extends Phaser.Scene {
     ];
     this.cellSize = 40;
     this.margin = 20; // Margen para evitar que el personaje se salga
-    this.isMobile = /Android|iPhone|iPad|iPod|Windows Phone/i.test(
-      navigator.userAgent
-    );
-    this.load.plugin('rexvirtualjoystickplugin', 'https://raw.githubusercontent.com/rexrainbow/phaser3-rex-notes/master/dist/rexvirtualjoystickplugin.min.js', true);
+    this.isMobile = /Android|iPhone|iPad|iPod|Windows Phone/i.test(navigator.userAgent);
+    this.joystick = null;
+    this.joystickBase = null;
+    this.joystickThumb = null;
+    this.joystickPointer = null; // Para rastrear el dedo que controla el joystick
+    this.joystickActive = false;
+    this.joystickRadius = 80; // Radio de la base del joystick
+    this.thumbRadius = 40;   // Radio del control (thumb)
+    this.joystickDeadZone = 10; // Pequeña zona muerta para evitar movimientos accidentales
   }
 
   preload() {
@@ -37,14 +42,8 @@ class ScenaJuego1 extends Phaser.Scene {
     this.load.image("pieza4", "assets/scenaJuego1/pieza4.png");
     this.load.image("pieza5", "assets/scenaJuego1/pieza5.png");
     this.load.image("pieza6", "assets/scenaJuego1/pieza6.png");
+    this.load.plugin('rexvirtualjoystickplugin', 'https://raw.githubusercontent.com/rexrainbow/phaser3-rex-notes/master/dist/rexvirtualjoystickplugin.min.js', true);
 
-    // Ya no necesitamos generar una textura para la luz si no usamos el sprite de luz
-    // const graphics = this.make.graphics();
-    // const radius = 150;
-    // graphics.fillStyle(0xffffff, 1);
-    // graphics.fillCircle(radius, radius, radius);
-    // graphics.generateTexture("light", radius * 2, radius * 2);
-    // graphics.destroy();
   }
 
   create() {
@@ -182,14 +181,7 @@ class ScenaJuego1 extends Phaser.Scene {
 
     // Añadir controles táctiles para móvil
     if (this.isMobile) {
-      this.joyStick = this.plugins.get('rexvirtualjoystickplugin').add(this, {
-        x: 150,
-        y: this.cameras.main.height - 150,
-        radius: 100,
-        base: this.add.circle(0, 0, 100, 0x888888, 0.5),
-        thumb: this.add.circle(0, 0, 50, 0xcccccc, 0.5)
-      });
-      this.joystickCursors = this.joyStick.createCursorKeys();
+      this.crearJoystickPersonalizado();
     }
 
     // Puntuación
@@ -476,27 +468,5 @@ class ScenaJuego1 extends Phaser.Scene {
     }
   }
 
-  const speed = 200; // Adjust as needed
-  if (this.player && this.joyStick && this.joystickCursors) {
-    let newVelocityX = 0;
-    let newVelocityY = 0;
-    if (this.joystickCursors.left.isDown) {
-      newVelocityX = -speed;
-    } else if (this.joystickCursors.right.isDown) {
-      newVelocityX = speed;
-    }
-    if (this.joystickCursors.up.isDown) {
-      newVelocityY = -speed;
-    } else if (this.joystickCursors.down.isDown) {
-      newVelocityY = speed;
-    }
-    this.player.setVelocityX(newVelocityX);
-    this.player.setVelocityY(newVelocityY);
-    if (newVelocityX !== 0 && newVelocityY !== 0) {
-      const length = Math.sqrt(newVelocityX * newVelocityX + newVelocityY * newVelocityY);
-      this.player.setVelocityX(newVelocityX / length * speed);
-      this.player.setVelocityY(newVelocityY / length * speed);
-    }
-  }
 }
 
