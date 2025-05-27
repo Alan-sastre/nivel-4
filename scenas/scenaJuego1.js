@@ -182,7 +182,14 @@ class ScenaJuego1 extends Phaser.Scene {
 
     // Añadir controles táctiles para móvil
     if (this.isMobile) {
-      this.createTouchControls();
+      this.joyStick = this.plugins.get('rexvirtualjoystickplugin').add(this, {
+        x: 150,
+        y: this.cameras.main.height - 150,
+        radius: 100,
+        base: this.add.circle(0, 0, 100, 0x888888, 0.5),
+        thumb: this.add.circle(0, 0, 50, 0xcccccc, 0.5)
+      });
+      this.joystickCursors = this.joyStick.createCursorKeys();
     }
 
     // Puntuación
@@ -441,21 +448,6 @@ class ScenaJuego1 extends Phaser.Scene {
       );
     }
   }
-
-  // Add virtual joystick (Moved inside create method)
-  this.joyStick = this.plugins.get('rexvirtualjoystickplugin').add(this, {
-  x: 150,
-  y: this.cameras.main.height - 150,
-  radius: 100,
-  base: this.add.circle(0, 0, 100, 0x888888, 0.5),
-  thumb: this.add.circle(0, 0, 50, 0xcccccc, 0.5),
-  // dir: '8dir',
-  // forceMin: 16,
-  // fixed: true,
-  // enable: true
-  });
-
-  this.joystickCursors = this.joyStick.createCursorKeys();
 
   // The robot movement code that uses this.joystickCursors
   // should be in the update() method, as previously suggested.
