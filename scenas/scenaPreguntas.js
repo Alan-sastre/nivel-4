@@ -216,7 +216,7 @@ class ScenaPreguntas extends Phaser.Scene {
 
             this.time.delayedCall(2500, () => {
                 console.log("Pasando a la siguiente parte...");
-                // this.scene.start('SiguienteNivel'); // O la escena que corresponda
+                this.scene.start("Rompecabezas");
             });
         } else {
             // Si la respuesta es incorrecta
