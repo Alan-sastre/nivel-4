@@ -34,10 +34,16 @@ class ScenaPreguntas extends Phaser.Scene {
         this.load.image('fondoTaller', 'assets/scenaPregunta/taller.jpg'); // Asegúrate que la ruta es correcta
     }
 
+    init(data) {
+        // Guardar datos de la escena anterior si existen
+        this.fromScene = data.fromScene || null;
+    }
+
     create() {
-        // Asegurar que el canvas se configure correctamente
+        // Asegurar que el canvas se configure correctamente sin usar reset()
         if (this.sys.game.renderer.type === Phaser.WEBGL) {
-            this.sys.game.renderer.reset();
+            // En lugar de reset(), podemos forzar una actualización del contexto
+            this.sys.game.renderer.pipelines.rebind();
         }
 
         // Añadir imagen de fondo

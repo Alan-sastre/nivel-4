@@ -550,12 +550,14 @@ class ScenaJuego1 extends Phaser.Scene {
             this.time.delayedCall(
               3000,
               () => {
-                // Modificar esta parte para una transición correcta
+                // Detener la escena actual
                 this.scene.stop("ScenaJuego1");
+
+                // Iniciar la escena de preguntas con datos adicionales
                 this.scene.start("ScenaPreguntas", { fromScene: "ScenaJuego1" });
 
-                // Asegurar que el canvas se configure correctamente
-                this.game.renderer.reset();
+                // Eliminar esta línea que causa el error
+                // this.game.renderer.reset();
               },
               [],
               this
