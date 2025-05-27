@@ -22,6 +22,7 @@ class ScenaJuego1 extends Phaser.Scene {
     this.isMobile = /Android|iPhone|iPad|iPod|Windows Phone/i.test(
       navigator.userAgent
     );
+    this.load.plugin('rexvirtualjoystickplugin', 'https://raw.githubusercontent.com/rexrainbow/phaser3-rex-notes/master/dist/rexvirtualjoystickplugin.min.js', true);
   }
 
   preload() {
@@ -440,4 +441,48 @@ class ScenaJuego1 extends Phaser.Scene {
       );
     }
   }
-}
+
+  // Add virtual joystick
+  this.joyStick = this.plugins.get('rexvirtualjoystickplugin').add(this, {
+  x: 150, // X position of the joystick
+  y: this.cameras.main.height - 150, // Y position of the joystick (bottom left)
+  radius: 100,
+  base: this.add.circle(0, 0, 100, 0x888888, 0.5),
+  thumb: this.add.circle(0, 0, 50, 0xcccccc, 0.5),
+  // dir: '8dir',   // 'up&down'|0, 'left&right'|1, '4dir'|2, '8dir'|3
+  // forceMin: 16,
+  // fixed: true,
+  // enable: true
+  });
+
+  this.joystickCursors = this.joyStick.createCursorKeys();
+
+  // Robot movement with joystick
+  const speed = 200; // Adjust as needed
+
+  if (this.robot) { // Ensure robot exists
+  let newVelocityX = 0;
+  let newVelocityY = 0;
+
+  if (this.joystickCursors.left.isDown) {
+  newVelocityX = -speed;
+  } else if (this.joystickCursors.right.isDown) {
+  newVelocityX = speed;
+  }
+
+  if (this.joystickCursors.up.isDown) {
+  newVelocityY = -speed;
+  } else if (this.joystickCursors.down.isDown) {
+  newVelocityY = speed;
+  }
+
+  this.robot.setVelocityX(newVelocityX);
+  this.robot.setVelocityY(newVelocityY);
+
+  // If you want diagonal movement to not be faster, you can normalize the speed
+  if (newVelocityX !== 0 && newVelocityY !== 0) {
+  const length = Math.sqrt(newVelocityX * newVelocityX + newVelocityY * newVelocityY);
+  this.robot.setVelocityX(newVelocityX / length * speed);
+  this.robot.setVelocityY(newVelocityY / length * speed);
+  }
+  }
