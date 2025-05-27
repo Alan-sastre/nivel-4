@@ -10,14 +10,6 @@ var config = {
     width: 1000,
     height: 500,
     autoCenter: Phaser.Scale.CENTER_BOTH,
-    min: {
-      width: 800,
-      height: 400,
-    },
-    max: {
-      width: 1600,
-      height: 800,
-    },
   },
   physics: {
     default: "arcade",
