@@ -711,10 +711,8 @@ class ArduinoGameScene2 extends Phaser.Scene {
               duration: 300,
               ease: "Power1",
               onComplete: () => {
-                // Cambiar a la siguiente escena después de mostrar el mensaje
-                this.time.delayedCall(1000, () => {
-                  this.scene.start("ScenaFinal"); 
-                });
+                // Cambiar a la siguiente escena inmediatamente
+                this.scene.start("ScenaFinal");
               },
             });
           });
