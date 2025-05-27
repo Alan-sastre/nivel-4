@@ -322,38 +322,65 @@ class ScenaJuego1 extends Phaser.Scene {
   }
 
   update() {
-    const velocidad = 80;
+    const velocidad = 160; // Puedes ajustar la velocidad del jugador
     let vx = 0;
     let vy = 0;
 
-    // Controles de teclado
-    if (!this.isMobile) {
-      if (this.cursors.left.isDown || this.keys.left.isDown) vx = -velocidad;
-      else if (this.cursors.right.isDown || this.keys.right.isDown)
-        vx = velocidad;
+    if (this.isMobile && this.joyStick && this.joystickCursors) {
+        // Movimiento con Joystick
+        if (this.joystickCursors.left.isDown) {
+            vx = -velocidad;
+        } else if (this.joystickCursors.right.isDown) {
+            vx = velocidad;
+        }
 
-      if (this.cursors.up.isDown || this.keys.up.isDown) vy = -velocidad;
-      else if (this.cursors.down.isDown || this.keys.down.isDown)
-        vy = velocidad;
+        if (this.joystickCursors.up.isDown) {
+            vy = -velocidad;
+        } else if (this.joystickCursors.down.isDown) {
+            vy = velocidad;
+        }
 
-      this.player.setVelocity(vx, vy);
+        this.player.setVelocity(vx, vy);
+
+        // Normalizar velocidad diagonal si es necesario (opcional)
+        if (vx !== 0 && vy !== 0) {
+            const length = Math.sqrt(vx * vx + vy * vy);
+            this.player.setVelocityX(vx / length * velocidad);
+            this.player.setVelocityY(vy / length * velocidad);
+        }
+
+    } else if (!this.isMobile) {
+        // Controles de teclado para PC
+        if (this.cursors.left.isDown || this.keys.left.isDown) vx = -velocidad;
+        else if (this.cursors.right.isDown || this.keys.right.isDown) vx = velocidad;
+        else vx = 0; // Detener si no hay tecla horizontal
+
+        if (this.cursors.up.isDown || this.keys.up.isDown) vy = -velocidad;
+        else if (this.cursors.down.isDown || this.keys.down.isDown) vy = velocidad;
+        else vy = 0; // Detener si no hay tecla vertical
+
+        this.player.setVelocity(vx, vy);
     }
 
     // Actualizar la Render Texture (nuestra nueva capa de oscuridad)
-    this.visionTexture.clear();
-    this.visionTexture.fill(0x000000, 1);
-    this.visionTexture.erase(this.lightBrush, this.player.x, this.player.y);
+    if (this.visionTexture && this.lightBrush && this.player) {
+        this.visionTexture.clear();
+        this.visionTexture.fill(0x000000, 1);
+        this.visionTexture.erase(this.lightBrush, this.player.x, this.player.y);
+    }
 
     // Actualizar animación según el movimiento
-    if (vx !== 0 || vy !== 0) {
-      this.player.anims.play("robot_run", true);
-      if (vx < 0) {
-        this.player.setFlipX(true);
-      } else if (vx > 0) {
-        this.player.setFlipX(false);
-      }
-    } else {
-      this.player.anims.play("robot_idle", true);
+    if (this.player) {
+        if (vx !== 0 || vy !== 0) {
+            this.player.anims.play("robot_run", true);
+            if (vx < 0) {
+                this.player.setFlipX(true);
+            } else if (vx > 0) {
+                this.player.setFlipX(false);
+            }
+        } else {
+            this.player.anims.play("robot_idle", true);
+        }
     }
   }
 
@@ -449,36 +476,27 @@ class ScenaJuego1 extends Phaser.Scene {
     }
   }
 
-  // The robot movement code that uses this.joystickCursors
-  // should be in the update() method, as previously suggested.
-  // If it's currently here, it should also be moved to update().
-
-  // Robot movement with joystick (should be here)
   const speed = 200; // Adjust as needed
-
-  if (this.robot && this.joyStick && this.joystickCursors) { // Ensure robot and joystick are initialized
-  let newVelocityX = 0;
-  let newVelocityY = 0;
-
-  if (this.joystickCursors.left.isDown) {
-  newVelocityX = -speed;
-  } else if (this.joystickCursors.right.isDown) {
-  newVelocityX = speed;
-  }
-
-  if (this.joystickCursors.up.isDown) {
-  newVelocityY = -speed;
-  } else if (this.joystickCursors.down.isDown) {
-  newVelocityY = speed;
-  }
-
-  this.robot.setVelocityX(newVelocityX);
-  this.robot.setVelocityY(newVelocityY);
-
-  if (newVelocityX !== 0 && newVelocityY !== 0) {
-  const length = Math.sqrt(newVelocityX * newVelocityX + newVelocityY * newVelocityY);
-  this.robot.setVelocityX(newVelocityX / length * speed);
-  this.robot.setVelocityY(newVelocityY / length * speed);
-  }
+  if (this.player && this.joyStick && this.joystickCursors) {
+    let newVelocityX = 0;
+    let newVelocityY = 0;
+    if (this.joystickCursors.left.isDown) {
+      newVelocityX = -speed;
+    } else if (this.joystickCursors.right.isDown) {
+      newVelocityX = speed;
+    }
+    if (this.joystickCursors.up.isDown) {
+      newVelocityY = -speed;
+    } else if (this.joystickCursors.down.isDown) {
+      newVelocityY = speed;
+    }
+    this.player.setVelocityX(newVelocityX);
+    this.player.setVelocityY(newVelocityY);
+    if (newVelocityX !== 0 && newVelocityY !== 0) {
+      const length = Math.sqrt(newVelocityX * newVelocityX + newVelocityY * newVelocityY);
+      this.player.setVelocityX(newVelocityX / length * speed);
+      this.player.setVelocityY(newVelocityY / length * speed);
+    }
   }
 }
+
