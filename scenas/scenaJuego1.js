@@ -442,14 +442,14 @@ class ScenaJuego1 extends Phaser.Scene {
     }
   }
 
-  // Add virtual joystick
+  // Add virtual joystick (Moved inside create method)
   this.joyStick = this.plugins.get('rexvirtualjoystickplugin').add(this, {
-  x: 150, // X position of the joystick
-  y: this.cameras.main.height - 150, // Y position of the joystick (bottom left)
+  x: 150,
+  y: this.cameras.main.height - 150,
   radius: 100,
   base: this.add.circle(0, 0, 100, 0x888888, 0.5),
   thumb: this.add.circle(0, 0, 50, 0xcccccc, 0.5),
-  // dir: '8dir',   // 'up&down'|0, 'left&right'|1, '4dir'|2, '8dir'|3
+  // dir: '8dir',
   // forceMin: 16,
   // fixed: true,
   // enable: true
@@ -457,10 +457,14 @@ class ScenaJuego1 extends Phaser.Scene {
 
   this.joystickCursors = this.joyStick.createCursorKeys();
 
-  // Robot movement with joystick
+  // The robot movement code that uses this.joystickCursors
+  // should be in the update() method, as previously suggested.
+  // If it's currently here, it should also be moved to update().
+
+  // Robot movement with joystick (should be here)
   const speed = 200; // Adjust as needed
 
-  if (this.robot) { // Ensure robot exists
+  if (this.robot && this.joyStick && this.joystickCursors) { // Ensure robot and joystick are initialized
   let newVelocityX = 0;
   let newVelocityY = 0;
 
@@ -479,10 +483,10 @@ class ScenaJuego1 extends Phaser.Scene {
   this.robot.setVelocityX(newVelocityX);
   this.robot.setVelocityY(newVelocityY);
 
-  // If you want diagonal movement to not be faster, you can normalize the speed
   if (newVelocityX !== 0 && newVelocityY !== 0) {
   const length = Math.sqrt(newVelocityX * newVelocityX + newVelocityY * newVelocityY);
   this.robot.setVelocityX(newVelocityX / length * speed);
   this.robot.setVelocityY(newVelocityY / length * speed);
   }
   }
+}
