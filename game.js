@@ -20,7 +20,14 @@ var config = {
   render: {
     pixelArt: true,
   },
-  scene: [Rompecabezas], //scenaPrincipal, ScenaJuego1,ScenaPreguntas,Rompecabezas,ArduinoGameScene,ArduinoGameScene2
+  scene: [
+    scenaPrincipal,
+    ScenaJuego1,
+    ScenaPreguntas,
+    Rompecabezas,
+    ArduinoGameScene,
+    ArduinoGameScene2,
+  ], //scenaPrincipal, ScenaJuego1,ScenaPreguntas,Rompecabezas,ArduinoGameScene,ArduinoGameScene2
 };
 
 var game = new Phaser.Game(config);

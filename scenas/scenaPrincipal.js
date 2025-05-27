@@ -1,6 +1,7 @@
 class scenaPrincipal extends Phaser.Scene {
   constructor() {
     super({ key: "scenaPrincipal", active: true });
+    this.musicManager = MusicManager.getInstance();
   }
 
   preload() {
@@ -48,9 +49,10 @@ class scenaPrincipal extends Phaser.Scene {
       ease: "Sine.easeInOut",
     });
 
-    // Reproducir la música
+    // Reproducir la música usando el gestor de música
     const musica = this.sound.add("musica"); // Crea una instancia del sonido
-    musica.play({ voluene: 0.1, loop: true }); // Reproduce la música con volumen 0.5 y bucle infinito
+    this.musicManager.setMusic(musica);
+    this.musicManager.playMusic(); // Reproduce la música con volumen 0.1 y bucle infinito
 
     // Escuchar la tecla espacio
     this.input.keyboard.on("keydown-SPACE", () => {
@@ -64,9 +66,8 @@ class scenaPrincipal extends Phaser.Scene {
   }
 
   cambiarEscena() {
-    // Detener la música antes de cambiar de escena (opcional)
-    this.sound.stopAll();
-
+    // Ya no detenemos la música al cambiar de escena
+    // this.sound.stopAll();
 
     this.scene.start("ScenaJuego1");
   }

@@ -5,6 +5,9 @@ class Rompecabezas extends Phaser.Scene {
         // Eliminado chasis del orden correcto
         this.ordenCorrecto = ['motores', 'sensores', 'arduino'];
         this.ordenActual = [];
+        // Añadir variable para rastrear si todos los paneles informativos han sido vistos
+        this.panelesInformativosVistos = 0;
+        this.listoParaCambiarEscena = false;
 
     // Información de cada pieza
     this.infoPiezas = {
@@ -210,7 +213,16 @@ class Rompecabezas extends Phaser.Scene {
                                 duration: 1000,
                                 ease: 'Bounce.Out',
                                 yoyo: true,
-                                repeat: 1
+                                repeat: 1,
+                                onComplete: () => {
+                                    // Verificar si todos los paneles informativos han sido vistos
+                                    if (this.panelesInformativosVistos === 3) {
+                                        this.cambiarALaSiguienteEscena();
+                                    } else {
+                                        this.listoParaCambiarEscena = true;
+                                        this.mensajeEstado.setText('Cierra todos los paneles informativos para continuar');
+                                    }
+                                }
                             });
                         });
                     }
@@ -375,6 +387,12 @@ class Rompecabezas extends Phaser.Scene {
         botonCerrar.on('pointerdown', () => {
             this.panelInfo.destroy();
             this.panelInfo = null;
+            this.panelesInformativosVistos++;
+
+            // Verificar si todas las piezas están colocadas y todos los paneles han sido vistos
+            if (this.listoParaCambiarEscena && this.panelesInformativosVistos === 3) {
+                this.cambiarALaSiguienteEscena();
+            }
         });
 
         // Añadir textos al contenedor
@@ -387,7 +405,37 @@ class Rompecabezas extends Phaser.Scene {
             if (this.panelInfo) {
                 this.panelInfo.destroy();
                 this.panelInfo = null;
+                this.panelesInformativosVistos++;
+
+                // Verificar si todas las piezas están colocadas y todos los paneles han sido vistos
+                if (this.listoParaCambiarEscena && this.panelesInformativosVistos === 3) {
+                    this.cambiarALaSiguienteEscena();
+                }
             }
+        });
+    }
+
+    // Añadir método para cambiar a la siguiente escena
+    cambiarALaSiguienteEscena() {
+        // Mostrar mensaje de transición
+        const gameWidth = this.sys.game.config.width;
+        const gameHeight = this.sys.game.config.height;
+
+        const mensajeTransicion = this.add.text(gameWidth / 2, gameHeight / 2, 'Cambiando a la siguiente fase...', {
+            fontSize: '32px',
+            fill: '#ffffff',
+            fontStyle: 'bold',
+            fontFamily: 'Arial',
+            stroke: '#000000',
+            strokeThickness: 4
+        }).setOrigin(0.5).setDepth(10);
+
+        // Añadir efecto de fade out/in para la transición
+        this.cameras.main.fadeOut(1000, 0, 0, 0);
+
+        this.cameras.main.once('camerafadeoutcomplete', () => {
+            // Cambiar a la siguiente escena (ScenaJuego1)
+            this.scene.start("ArduinoGameScene");
         });
     }
 
@@ -395,4 +443,3 @@ class Rompecabezas extends Phaser.Scene {
         // No se necesita código aquí, los eventos están en create()
     }
 }
-// Eliminar la línea de exportación
