@@ -19,6 +19,9 @@ class ScenaJuego1 extends Phaser.Scene {
     ];
     this.cellSize = 40;
     this.margin = 20; // Margen para evitar que el personaje se salga
+    this.isMobile = /Android|iPhone|iPad|iPod|Windows Phone/i.test(
+      navigator.userAgent
+    );
   }
 
   preload() {
@@ -176,13 +179,18 @@ class ScenaJuego1 extends Phaser.Scene {
       right: Phaser.Input.Keyboard.KeyCodes.D,
     });
 
+    // Añadir controles táctiles para móvil
+    if (this.isMobile) {
+      this.createTouchControls();
+    }
+
     // Puntuación
     this.scoreText = this.add.text(16, 16, "Piezas: 0/" + this.totalPiezas, {
       fontSize: "24px",
       fill: "#fff",
       fontFamily: "Arial",
     });
-    this.scoreText.setDepth(1001); // Asegurar que el texto esté sobre la oscuridad
+    this.scoreText.setDepth(1001);
 
     // Añadir contador de tipos de piezas
     this.piezasTipo1 = 0;
@@ -196,43 +204,113 @@ class ScenaJuego1 extends Phaser.Scene {
       fill: "#fff",
       fontFamily: "Arial",
     });
-    this.piezasText.setDepth(1001); // Asegurar que el texto esté sobre la oscuridad
+    this.piezasText.setDepth(1001);
 
     // Crear el pincel para la luz con bordes suaves
     this.lightBrush = this.make.graphics();
-    const lightOuterRadius = 100; // El radio exterior máximo del efecto de luz
-    const numberOfBrushLayers = 20; // Número de capas para crear el degradado del pincel
-    // Alpha por capa: al acumularse, el centro será más opaco (borrará más)
+    const lightOuterRadius = 100;
+    const numberOfBrushLayers = 20;
     const alphaPerLayer = 0.1;
 
     this.lightBrush.clear();
-    // Dibujamos círculos concéntricos, desde el más grande al más pequeño.
-    // Cada círculo añade opacidad al pincel en el área que cubre.
-    // El centro, cubierto por todos los círculos, será el más opaco.
     for (let i = 0; i < numberOfBrushLayers; i++) {
-        // El radio del círculo actual en esta capa del pincel.
-        // Va desde lightOuterRadius hasta casi 0.
-        const currentBrushRadius = lightOuterRadius - (i * lightOuterRadius / numberOfBrushLayers);
-        if (currentBrushRadius <= 0) continue;
+      const currentBrushRadius =
+        lightOuterRadius - (i * lightOuterRadius) / numberOfBrushLayers;
+      if (currentBrushRadius <= 0) continue;
 
-        this.lightBrush.fillStyle(0xffffff, alphaPerLayer);
-        this.lightBrush.fillCircle(0, 0, currentBrushRadius);
+      this.lightBrush.fillStyle(0xffffff, alphaPerLayer);
+      this.lightBrush.fillCircle(0, 0, currentBrushRadius);
     }
-    // Ahora this.lightBrush es un círculo blanco, opaco en el centro y transparente en los bordes.
 
     // Crear la Render Texture que actuará como nuestra capa de oscuridad
-    this.visionTexture = this.make.renderTexture({
-      width: this.sys.game.config.width,
-      height: this.sys.game.config.height
-    }, false);
+    this.visionTexture = this.make.renderTexture(
+      {
+        width: this.sys.game.config.width,
+        height: this.sys.game.config.height,
+      },
+      false
+    );
 
-    // Añadir la Render Texture a la escena y asegurar que esté por encima de todo (excepto UI)
     this.add.existing(this.visionTexture);
     this.visionTexture.setDepth(1000);
+  }
 
-    // Ya no necesitamos el antiguo this.darkness
-    // this.darkness = this.add.graphics();
-    // this.darkness.setDepth(1000);
+  createTouchControls() {
+    const screenWidth = this.sys.game.config.width;
+    const screenHeight = this.sys.game.config.height;
+    const buttonSize = 60;
+    const padding = 20;
+
+    // Crear grupo para los controles táctiles
+    this.touchControls = this.add.group();
+
+    // Crear los botones de control
+    const directions = [
+      {
+        key: "up",
+        x: screenWidth - buttonSize * 2 - padding,
+        y: screenHeight - buttonSize * 2 - padding,
+      },
+      {
+        key: "down",
+        x: screenWidth - buttonSize * 2 - padding,
+        y: screenHeight - buttonSize - padding,
+      },
+      {
+        key: "left",
+        x: screenWidth - buttonSize * 3 - padding,
+        y: screenHeight - buttonSize - padding,
+      },
+      {
+        key: "right",
+        x: screenWidth - buttonSize - padding,
+        y: screenHeight - buttonSize - padding,
+      },
+    ];
+
+    directions.forEach((dir) => {
+      const button = this.add.graphics();
+      button.fillStyle(0xffffff, 0.3);
+      button.fillRoundedRect(dir.x, dir.y, buttonSize, buttonSize, 10);
+      button.lineStyle(2, 0xffffff, 0.5);
+      button.strokeRoundedRect(dir.x, dir.y, buttonSize, buttonSize, 10);
+
+      const zone = this.add
+        .zone(dir.x, dir.y, buttonSize, buttonSize)
+        .setOrigin(0)
+        .setInteractive();
+
+      // Añadir el botón y la zona al grupo
+      this.touchControls.add(button);
+      this.touchControls.add(zone);
+
+      // Configurar eventos táctiles
+      zone.on("pointerdown", () => {
+        this.player.setVelocity(0, 0);
+        switch (dir.key) {
+          case "up":
+            this.player.setVelocityY(-80);
+            break;
+          case "down":
+            this.player.setVelocityY(80);
+            break;
+          case "left":
+            this.player.setVelocityX(-80);
+            break;
+          case "right":
+            this.player.setVelocityX(80);
+            break;
+        }
+      });
+
+      zone.on("pointerup", () => {
+        this.player.setVelocity(0, 0);
+      });
+
+      zone.on("pointerout", () => {
+        this.player.setVelocity(0, 0);
+      });
+    });
   }
 
   update() {
@@ -240,26 +318,23 @@ class ScenaJuego1 extends Phaser.Scene {
     let vx = 0;
     let vy = 0;
 
-    // Controles
-    if (this.cursors.left.isDown || this.keys.left.isDown) vx = -velocidad;
-    else if (this.cursors.right.isDown || this.keys.right.isDown)
-      vx = velocidad;
+    // Controles de teclado
+    if (!this.isMobile) {
+      if (this.cursors.left.isDown || this.keys.left.isDown) vx = -velocidad;
+      else if (this.cursors.right.isDown || this.keys.right.isDown)
+        vx = velocidad;
 
-    if (this.cursors.up.isDown || this.keys.up.isDown) vy = -velocidad;
-    else if (this.cursors.down.isDown || this.keys.down.isDown) vy = velocidad;
+      if (this.cursors.up.isDown || this.keys.up.isDown) vy = -velocidad;
+      else if (this.cursors.down.isDown || this.keys.down.isDown)
+        vy = velocidad;
 
-    this.player.setVelocity(vx, vy);
+      this.player.setVelocity(vx, vy);
+    }
 
     // Actualizar la Render Texture (nuestra nueva capa de oscuridad)
-    this.visionTexture.clear(); // Limpiar la textura de la iteración anterior
-
-    // 1. Rellenar toda la Render Texture con negro completamente opaco
+    this.visionTexture.clear();
     this.visionTexture.fill(0x000000, 1);
-
-    // 2. "Borrar" un área usando nuestro pincel de luz suave, centrado en el jugador
     this.visionTexture.erase(this.lightBrush, this.player.x, this.player.y);
-
-    // El código anterior para el difuminado ya no es necesario aquí.
 
     // Actualizar animación según el movimiento
     if (vx !== 0 || vy !== 0) {
@@ -318,36 +393,51 @@ class ScenaJuego1 extends Phaser.Scene {
       this.player.setActive(false);
 
       // Esperar 2 segundos antes de mostrar el mensaje
-      this.time.delayedCall(2000, () => {
-        const completedText = this.add.text(0, 0, "¡Enhorabuena!\nHa logrado encontrar todas las piezas.", {
-          fontSize: "36px", // Tamaño de fuente adecuado
-          fill: "#FFFFFF", // Color blanco clásico
-          fontFamily: "Arial, sans-serif", // Fuente estándar y formal
-          align: "center",
-          wordWrap: { width: this.sys.game.config.width - 60 }
-        });
-        completedText.setOrigin(0.5, 0.5);
-        completedText.setPosition(
-          this.sys.game.config.width / 2,
-          this.sys.game.config.height / 2
-        );
-        completedText.setDepth(1002); // Asegurar que esté sobre todo
+      this.time.delayedCall(
+        2000,
+        () => {
+          const completedText = this.add.text(
+            0,
+            0,
+            "¡Enhorabuena!\nHa logrado encontrar todas las piezas.",
+            {
+              fontSize: "36px", // Tamaño de fuente adecuado
+              fill: "#FFFFFF", // Color blanco clásico
+              fontFamily: "Arial, sans-serif", // Fuente estándar y formal
+              align: "center",
+              wordWrap: { width: this.sys.game.config.width - 60 },
+            }
+          );
+          completedText.setOrigin(0.5, 0.5);
+          completedText.setPosition(
+            this.sys.game.config.width / 2,
+            this.sys.game.config.height / 2
+          );
+          completedText.setDepth(1002); // Asegurar que esté sobre todo
 
-        // Eliminamos la animación tween para un mensaje más formal
-        // this.tweens.add({
-        //   targets: completedText,
-        //   scale: 1.1,
-        //   ease: 'Power1',
-        //   duration: 500,
-        //   yoyo: true,
-        //   repeat: 1
-        // });
+          // Eliminamos la animación tween para un mensaje más formal
+          // this.tweens.add({
+          //   targets: completedText,
+          //   scale: 1.1,
+          //   ease: 'Power1',
+          //   duration: 500,
+          //   yoyo: true,
+          //   repeat: 1
+          // });
 
-        // Esperar 3 segundos más antes de cambiar de escena
-        this.time.delayedCall(3000, () => {
-          this.scene.start("scenaPreguntas");
-        }, [], this);
-      }, [], this);
+          // Esperar 3 segundos más antes de cambiar de escena
+          this.time.delayedCall(
+            3000,
+            () => {
+              this.scene.start("scenaPreguntas");
+            },
+            [],
+            this
+          );
+        },
+        [],
+        this
+      );
     }
   }
 }

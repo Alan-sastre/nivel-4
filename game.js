@@ -23,10 +23,7 @@ var config = {
   scene: [
     scenaPrincipal,
     ScenaJuego1,
-    ScenaPreguntas,
-    Rompecabezas,
-    ArduinoGameScene,
-    ArduinoGameScene2,
+
   ], //scenaPrincipal, ScenaJuego1,ScenaPreguntas,Rompecabezas,ArduinoGameScene,ArduinoGameScene2
 };
 
