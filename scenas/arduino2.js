@@ -763,5 +763,23 @@ class ArduinoGameScene2 extends Phaser.Scene {
     }
   }
 
-  update() {}
+  update() {
+    // Añadir un detector de clic en toda la pantalla para facilitar la transición
+    if (!this.hasAddedClickListener) {
+      this.hasAddedClickListener = true;
+
+      this.input.on('pointerdown', () => {
+        console.log("Clic detectado en la pantalla");
+        console.log("Intentando iniciar ScenaFinal...");
+
+        // Intentar iniciar la escena directamente
+        try {
+          this.scene.start("ScenaFinal");
+          console.log("Transición a ScenaFinal iniciada");
+        } catch (error) {
+          console.error("Error al iniciar ScenaFinal:", error);
+        }
+      });
+    }
+  }
 }
