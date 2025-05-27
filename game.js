@@ -31,6 +31,7 @@ var config = {
     Rompecabezas,
     ArduinoGameScene,
     ArduinoGameScene2,
+    ScenaFinal,
   ],
 };
 
