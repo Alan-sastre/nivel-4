@@ -546,7 +546,11 @@ class ArduinoGameScene2 extends Phaser.Scene {
           )
           .setOrigin(0.5, 0);
 
-
+        // Definir las variables del botón
+        const buttonWidth = 200;
+        const buttonHeight = 50;
+        const buttonX = this.cameras.main.width / 2 - buttonWidth / 2;
+        const buttonY = codePanelY + codePanelHeight + 60;
 
         // Fondo del botón - Hacerlo más visible
         const continueButtonBg = this.add.graphics();
@@ -568,7 +572,17 @@ class ArduinoGameScene2 extends Phaser.Scene {
         );
 
         // Texto del botón - Más grande y visible
-
+        const buttonText = this.add.text(
+          buttonX + buttonWidth / 2,
+          buttonY + buttonHeight / 2,
+          "CONTINUAR",
+          {
+            fontSize: "18px",
+            fill: "#ffffff",
+            fontFamily: "Arial, sans-serif",
+            fontWeight: "bold"
+          }
+        ).setOrigin(0.5);
 
         // Añadir un mensaje flotante encima del botón
         const floatingMessage = this.add
