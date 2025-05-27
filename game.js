@@ -5,10 +5,10 @@ function isMobile() {
 var config = {
   type: Phaser.AUTO,
   scale: {
-    mode: Phaser.Scale.RESIZE,
+    mode: Phaser.Scale.FIT,
     parent: "game",
-    width: "100%",
-    height: "100%",
+    width: 1000,
+    height: 500,
     autoCenter: Phaser.Scale.CENTER_BOTH,
     min: {
       width: 800,
@@ -30,6 +30,7 @@ var config = {
     pixelArt: true,
     antialias: true,
     roundPixels: true,
+    willReadFrequently: true,
   },
   scene: [
     scenaPrincipal,
