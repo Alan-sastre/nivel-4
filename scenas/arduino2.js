@@ -712,7 +712,7 @@ class ArduinoGameScene2 extends Phaser.Scene {
               ease: "Power1",
               onComplete: () => {
                 // Añadir un retraso de 1 segundo antes de cambiar a la siguiente escena
-                this.time.delayedCall(1000, () => {
+                this.time.delayedCall(2000, () => {
                   this.scene.start("ScenaFinal");
                 });
               },

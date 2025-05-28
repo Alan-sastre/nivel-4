@@ -83,6 +83,36 @@ class ScenaFinal extends Phaser.Scene {
         );
         message.setOrigin(0.5);
 
+        // Nuevo mensaje destacado
+        const highlightStyle = {
+            fontSize: this.isMobile ? '20px' : '26px',
+            fontFamily: 'Arial, sans-serif',
+            color: '#ffff00',
+            align: 'center',
+            stroke: '#ff4400',
+            strokeThickness: 4,
+            wordWrap: { width: screenWidth * 0.8 },
+            shadow: { offsetX: 1, offsetY: 1, color: '#000', blur: 2, stroke: true, fill: true }
+        };
+
+        const highlightMessage = this.add.text(
+            screenWidth / 2,
+            screenHeight / 2 + 80,
+            '¡Felicidades! Has demostrado tus habilidades en robótica y programación.\n¡Eres un verdadero ingeniero espacial!',
+            highlightStyle
+        );
+        highlightMessage.setOrigin(0.5);
+
+        // Añadir efecto de brillo al mensaje destacado
+        this.tweens.add({
+            targets: highlightMessage,
+            alpha: 0.7,
+            duration: 1500,
+            yoyo: true,
+            repeat: -1,
+            ease: 'Sine.easeInOut'
+        });
+
         // Botón para continuar
         const buttonStyle = {
             fontSize: this.isMobile ? '16px' : '20px',
