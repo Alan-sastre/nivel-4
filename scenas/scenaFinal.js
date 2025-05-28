@@ -201,7 +201,7 @@ class ScenaFinal extends Phaser.Scene {
                 )
                 .setOrigin(0.5)
                 .setPadding(16)
-                .setDepth(1000);
+                .setDepth(1000); // Este mensaje tiene una profundidad alta
         }
     }
 
