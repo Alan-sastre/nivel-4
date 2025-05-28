@@ -777,7 +777,7 @@ class ArduinoGameScene2 extends Phaser.Scene {
         // Esperar 2 segundos antes de cambiar de escena
         this.time.delayedCall(2000, () => {
           try {
-            this.scene.start("ScenaFinal");
+            this.scene.start("scenaVideo4");
             console.log("Transición a ScenaFinal iniciada");
           } catch (error) {
             console.error("Error al iniciar ScenaFinal:", error);

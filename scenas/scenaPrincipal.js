@@ -121,7 +121,7 @@ class scenaPrincipal extends Phaser.Scene {
     if (this.isMobile && window.innerWidth <= window.innerHeight) {
       return;
     }
-    this.scene.start("ScenaJuego1");
+    this.scene.start("scenaVideo");
   }
 
   update() {

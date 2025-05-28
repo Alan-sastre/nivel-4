@@ -26,11 +26,15 @@ var config = {
   },
   scene: [
     scenaPrincipal,
+    scenaVideo,
     ScenaJuego1,
     ScenaPreguntas,
+    scenaVideo2,
     Rompecabezas,
+    scenaVideo3,
     ArduinoGameScene,
     ArduinoGameScene2,
+    scenaVideo4,
     ScenaFinal,
   ],
 };

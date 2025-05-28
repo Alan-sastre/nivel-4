@@ -435,7 +435,7 @@ class Rompecabezas extends Phaser.Scene {
 
         this.cameras.main.once('camerafadeoutcomplete', () => {
             // Cambiar a la siguiente escena (ScenaJuego1)
-            this.scene.start("ArduinoGameScene");
+            this.scene.start("scenaVideo3");
         });
     }
 
