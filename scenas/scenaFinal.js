@@ -24,22 +24,30 @@ class ScenaFinal extends Phaser.Scene {
         }
 
         // Mensaje central con animación
-        const mensaje = this.add.text(
+        const mensaje = this.add
+          .text(
             this.cameras.main.centerX,
             this.cameras.main.centerY,
-            '¡La misión ha terminado con éxito!\n\nPrepárate para las siguientes aventuras',
+            "¡La misión ha terminado con éxito!\n\nPrepárate para las siguientes aventuras",
             {
-                fontFamily: 'Arial Black',
-                fontSize: '36px',
-                color: '#00ffe7',
-                align: 'center',
-                backgroundColor: 'rgba(10,10,30,0.8)',
-                padding: { x: 30, y: 30 },
-                stroke: '#fff',
-                strokeThickness: 6,
-                shadow: { offsetX: 2, offsetY: 2, color: '#000', blur: 8, fill: true }
+              fontFamily: "Arial Black",
+              fontSize: "36px",
+              color: "#ffffff",
+              align: "center",
+              backgroundColor: "rgba(10,10,30,0.8)",
+              padding: { x: 30, y: 30 },
+              stroke: "#fff",
+              strokeThickness: 6,
+              shadow: {
+                offsetX: 2,
+                offsetY: 2,
+                color: "#000",
+                blur: 8,
+                fill: true,
+              },
             }
-        ).setOrigin(0.5);
+          )
+          .setOrigin(0.5);
         mensaje.setAlpha(0);
         this.tweens.add({
             targets: mensaje,
