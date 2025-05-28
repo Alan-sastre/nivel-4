@@ -5,8 +5,7 @@ class ScenaFinal extends Phaser.Scene {
     }
 
     preload() {
-        // Puedes usar una imagen de fondo espacial si tienes una, por ejemplo: this.load.image('space', 'ruta/a/tu/espacio.png');
-        // Si no, usaremos gráficos generados por código
+
     }
 
     create() {

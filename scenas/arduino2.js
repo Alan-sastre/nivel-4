@@ -774,13 +774,15 @@ class ArduinoGameScene2 extends Phaser.Scene {
         console.log("Clic detectado en la pantalla");
         console.log("Intentando iniciar ScenaFinal...");
 
-        // Intentar iniciar la escena directamente
-        try {
-          this.scene.start("ScenaFinal");
-          console.log("Transición a ScenaFinal iniciada");
-        } catch (error) {
-          console.error("Error al iniciar ScenaFinal:", error);
-        }
+        // Esperar 2 segundos antes de cambiar de escena
+        this.time.delayedCall(2000, () => {
+          try {
+            this.scene.start("ScenaFinal");
+            console.log("Transición a ScenaFinal iniciada");
+          } catch (error) {
+            console.error("Error al iniciar ScenaFinal:", error);
+          }
+        });
       });
     }
   }
