@@ -53,7 +53,7 @@ class scenaVideo2 extends Phaser.Scene {
       if (audioManager) {
         audioManager.resumeMusic();
       }
-      this.scene.start("ScenaJuego1");
+      this.scene.start("Rompecabezas");
     });
 
     const buttonStyle = {
