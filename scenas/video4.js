@@ -49,7 +49,6 @@ class scenaVideo4 extends Phaser.Scene {
     video.play();
 
     video.on("complete", () => {
-      // Reanudar la música antes de cambiar de escena
       if (audioManager) {
         audioManager.resumeMusic();
       }
@@ -98,4 +97,4 @@ class scenaVideo4 extends Phaser.Scene {
   }
 }
 
-window.scenaVideo = scenaVideo;
+window.scenaVideo4 = scenaVideo4;
