@@ -49,10 +49,11 @@ class scenaVideo4 extends Phaser.Scene {
     video.play();
 
     video.on("complete", () => {
+      // Reanudar la música antes de cambiar de escena
       if (audioManager) {
         audioManager.resumeMusic();
       }
-      this.scene.start("scenaFinal");
+      this.scene.start("ScenaFinal");
     });
 
     const buttonStyle = {
