@@ -313,85 +313,86 @@ class ScenaJuego1 extends Phaser.Scene {
   }
 
   crearJoystickPersonalizado() {
-    const screenWidth = this.sys.game.config.width;
-    const screenHeight = this.sys.game.config.height;
+      const screenWidth = this.sys.game.config.width;
+      const screenHeight = this.sys.game.config.height;
 
-    // Posición del joystick (esquina inferior derecha)
-    const joystickX = screenWidth - 150;
-    const joystickY = screenHeight - 150;
+      // Posición del joystick (esquina inferior derecha)
+      const joystickX = screenWidth - 150;
+      const joystickY = screenHeight - 150;
 
-    // Crear la base del joystick
-    this.joystickBase = this.add.graphics();
-    this.joystickBase.fillStyle(0x888888, 0.5);
-    this.joystickBase.fillCircle(joystickX, joystickY, this.joystickRadius);
-    this.joystickBase.lineStyle(4, 0xffffff, 0.8);
-    this.joystickBase.strokeCircle(joystickX, joystickY, this.joystickRadius);
-    this.joystickBase.setScrollFactor(0);
-    this.joystickBase.setDepth(1000);
+      // Crear la base del joystick
+      this.joystickBase = this.add.graphics();
+      this.joystickBase.fillStyle(0x888888, 0.5);
+      this.joystickBase.fillCircle(joystickX, joystickY, this.joystickRadius);
+      this.joystickBase.lineStyle(4, 0xffffff, 0.8);
+      this.joystickBase.strokeCircle(joystickX, joystickY, this.joystickRadius);
+      this.joystickBase.setScrollFactor(0);
+      this.joystickBase.setDepth(1002); // Cambiado de 1000 a 1002
 
-    // Crear el thumb del joystick
-    this.joystickThumb = this.add.graphics();
-    this.joystickThumb.fillStyle(0xffffff, 0.9);
-    this.joystickThumb.fillCircle(joystickX, joystickY, this.thumbRadius);
-    this.joystickThumb.lineStyle(2, 0x000000, 0.5);
-    this.joystickThumb.strokeCircle(joystickX, joystickY, this.thumbRadius);
-    this.joystickThumb.setScrollFactor(0);
-    this.joystickThumb.setDepth(1001);
+      // Crear el thumb del joystick
+      this.joystickThumb = this.add.graphics();
+      this.joystickThumb.fillStyle(0xffffff, 0.9);
+      this.joystickThumb.fillCircle(joystickX, joystickY, this.thumbRadius);
+      this.joystickThumb.lineStyle(2, 0x000000, 0.5);
+      this.joystickThumb.strokeCircle(joystickX, joystickY, this.thumbRadius);
+      this.joystickThumb.setScrollFactor(0);
+      this.joystickThumb.setDepth(1003); // Cambiado de 1001 a 1003
 
-    // Crear zona interactiva más grande para mejor usabilidad
-    const interactiveZone = this.add.zone(joystickX, joystickY, this.joystickRadius * 2.5, this.joystickRadius * 2.5);
-    interactiveZone.setInteractive();
-    interactiveZone.setScrollFactor(0);
-    interactiveZone.setDepth(999);
-    interactiveZone.setOrigin(0.5);
+      // Crear zona interactiva más grande para mejor usabilidad
+      const interactiveZone = this.add.zone(joystickX, joystickY, this.joystickRadius * 2.5, this.joystickRadius * 2.5);
+      interactiveZone.setInteractive();
+      interactiveZone.setScrollFactor(0);
+      interactiveZone.setDepth(1004); // Cambiado de 999 a 1004
+      interactiveZone.setOrigin(0.5);
 
-    // Eventos del joystick
-    interactiveZone.on('pointerdown', (pointer) => {
-      if (!this.joystickActive) {
-        this.joystickActive = true;
-        this.joystickPointer = pointer;
-        this.actualizarPosicionThumb(pointer, joystickX, joystickY);
-      }
-    });
+      // Eventos del joystick
+      interactiveZone.on('pointerdown', (pointer) => {
+        if (!this.joystickActive) {
+          this.joystickActive = true;
+          this.joystickPointer = pointer;
+          this.actualizarPosicionThumb(pointer, joystickX, joystickY);
+        }
+      });
 
-    this.input.on('pointermove', (pointer) => {
-      if (this.joystickActive && pointer.id === this.joystickPointer.id) {
-        this.actualizarPosicionThumb(pointer, joystickX, joystickY);
-      }
-    });
+      this.input.on('pointermove', (pointer) => {
+        if (this.joystickActive && pointer.id === this.joystickPointer.id) {
+          this.actualizarPosicionThumb(pointer, joystickX, joystickY);
+        }
+      });
 
-    this.input.on('pointerup', (pointer) => {
-      if (this.joystickActive && pointer.id === this.joystickPointer.id) {
-        this.joystickActive = false;
-        this.joystickPointer = null;
-        this.joystickVector = { x: 0, y: 0 };
+      this.input.on('pointerup', (pointer) => {
+        if (this.joystickActive && pointer.id === this.joystickPointer.id) {
+          this.joystickActive = false;
+          this.joystickPointer = null;
+          this.joystickVector = { x: 0, y: 0 };
 
-        // Volver el thumb al centro
-        this.joystickThumb.clear();
-        this.joystickThumb.fillStyle(0xffffff, 0.9);
-        this.joystickThumb.fillCircle(joystickX, joystickY, this.thumbRadius);
-        this.joystickThumb.lineStyle(2, 0x000000, 0.5);
-        this.joystickThumb.strokeCircle(joystickX, joystickY, this.thumbRadius);
-      }
-    });
+          // Volver el thumb al centro
+          this.joystickThumb.clear();
+          this.joystickThumb.fillStyle(0xffffff, 0.9);
+          this.joystickThumb.fillCircle(joystickX, joystickY, this.thumbRadius);
+          this.joystickThumb.lineStyle(2, 0x000000, 0.5);
+          this.joystickThumb.strokeCircle(joystickX, joystickY, this.thumbRadius);
+          this.joystickThumb.setDepth(1003); // Añadir esta línea
+        }
+      });
 
-    this.input.on('pointerupoutside', (pointer) => {
-      if (this.joystickActive && pointer.id === this.joystickPointer.id) {
-        this.joystickActive = false;
-        this.joystickPointer = null;
-        this.joystickVector = { x: 0, y: 0 };
+      this.input.on('pointerupoutside', (pointer) => {
+        if (this.joystickActive && pointer.id === this.joystickPointer.id) {
+          this.joystickActive = false;
+          this.joystickPointer = null;
+          this.joystickVector = { x: 0, y: 0 };
 
-        // Volver el thumb al centro
-        this.joystickThumb.clear();
-        this.joystickThumb.fillStyle(0xffffff, 0.9);
-        this.joystickThumb.fillCircle(joystickX, joystickY, this.thumbRadius);
-        this.joystickThumb.lineStyle(2, 0x000000, 0.5);
-        this.joystickThumb.strokeCircle(joystickX, joystickY, this.thumbRadius);
-      }
-    });
+          // Volver el thumb al centro
+          this.joystickThumb.clear();
+          this.joystickThumb.fillStyle(0xffffff, 0.9);
+          this.joystickThumb.fillCircle(joystickX, joystickY, this.thumbRadius);
+          this.joystickThumb.lineStyle(2, 0x000000, 0.5);
+          this.joystickThumb.strokeCircle(joystickX, joystickY, this.thumbRadius);
+        }
+      });
 
-    // Inicializar vector del joystick
-    this.joystickVector = { x: 0, y: 0 };
+      // Inicializar vector del joystick
+      this.joystickVector = { x: 0, y: 0 };
   }
 
   actualizarPosicionThumb(pointer, baseX, baseY) {
@@ -427,7 +428,8 @@ class ScenaJuego1 extends Phaser.Scene {
     this.joystickThumb.fillCircle(thumbX, thumbY, this.thumbRadius);
     this.joystickThumb.lineStyle(2, 0x000000, 0.5);
     this.joystickThumb.strokeCircle(thumbX, thumbY, this.thumbRadius);
-  }
+    this.joystickThumb.setDepth(1003); // Añadir esta línea para mantener el depth
+}
 
   update() {
     const velocidad = 200; // Velocidad aumentada para mejor respuesta
